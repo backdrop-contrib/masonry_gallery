@@ -36,12 +36,12 @@ https://github.com/backdrop-contrib/masonry_gallery/issues
 Known Issues
 ------------
 
-Some lightbox modules may display images in a wrong sequence by following columns direction instead of intended left to right order.
+Some lightbox modules may display images in a wrong sequence following columns direction instead of intended left to right order.
 
 Current Maintainers
 -------------------
 
-- Pavel (https://github.com/korontari)
+- [Pavel](https://github.com/korontari)
 - Co-maintainers are welcome.
 
 Credits
