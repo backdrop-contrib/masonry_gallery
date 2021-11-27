@@ -31,7 +31,7 @@ Issues
 ------
 
 Bugs and Feature requests should be reported in the Issue Queue:
-https://github.com/backdrop-contrib/mosaic_grid/issues
+https://github.com/backdrop-contrib/masonry_gallery/issues
 
 Known Issues
 ------------
@@ -48,7 +48,7 @@ Credits
 -------
 
 - Written for Backdrop by [Pavel](https://github.com/korontari).
-- [LazyLoad](https://github.com/verlok/vanilla-lazyload) plugin(MIT license) by Andrea Verlicchi.
+- [LazyLoad](https://github.com/verlok/vanilla-lazyload) plugin(MIT license) by [Andrea Verlicchi](https://github.com/verlok).
 
 License
 -------
