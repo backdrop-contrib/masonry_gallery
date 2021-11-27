@@ -1,0 +1,7 @@
+name = Masonry Gallery
+description = Provides views style plugin for building image galleries layed out as a responsive masonry grid.
+backdrop = 1.x
+package = Views
+type = module
+dependencies[] = views
+configure = admin/config/media/masonry_gallery
