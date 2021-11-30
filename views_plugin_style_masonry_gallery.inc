@@ -152,10 +152,12 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
       'alt'        => t('Image alt tag'),
       'title'      => t('Image title tag'),
     );
-    // Detect if text or title field is present, and add it to the options list.
-    $text_field = $this->get_first_non_excluded_text_field()['handler'];
-    if (!empty($text_field)) {
-      $caption_options['text'] = $text_field->ui_name();
+    // Detect if valid text fields are present, and add them to the options list.
+    $text_fields = $this->get_non_excluded_text_fields();
+    if (!empty($text_fields)) {
+      foreach ($text_fields as $field_name => $text_field) {
+        $caption_options[$field_name] = $text_field->ui_name();
+      }
     }
     // Create caption selector form.
     $form['caption']['source'] = array(
@@ -246,11 +248,10 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
   }
 
   /**
-   * Returns first non-excluded field by type.
-   * Returned value is an array containing handler and field's name. Works only
-   * for views_handler_field_field types that have field_info and for title fields.
+   * Returns first non-excluded image field.
+   * Returned value is an array containing handler and field's name.
    */
-  protected function get_first_non_excluded_field(string $field_type) {
+  function get_first_non_excluded_image_field() {
     $fields = $this->view->display_handler->get_handlers('field');
 
     foreach ($fields as $field_name => $field) {
@@ -258,44 +259,50 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
       if (!empty($field->options['exclude']))
         continue;
 
-      if (isset($field->field_info) || $field_type == 'title') {
-        $type = FALSE;
-        if (!empty($field->field_info['type'])) {
-          $type = $field->field_info['type'];
-        }
-        // If it is of required type, return field handler and field name.
-        // Title has no field_info, so add a second condition.
-        if ($field_type == $type || ($field_type == 'title' && $field_name == 'title')) {
+      if (isset($field->field_info)) {
+        $type = empty($field->field_info['type']) ? NULL : $field->field_info['type'];
+        // If it is of image type, return field handler and field name.
+        if ($type == 'image') {
           return array('handler' => $field, 'field_name' => $field_name);
         }
       }
-
     }
     return NULL;
   }
 
-  /*
-   * Returns first non excluded image field.
+  /**
+   * Returns all valid non-excluded text fields.
+   * Returned value is an array containing (field's name => handler) pairs.
    */
-  function get_first_non_excluded_image_field() {
-    return $this->get_first_non_excluded_field('image');
-  }
+  function get_non_excluded_text_fields() {
+    $fields = $this->view->display_handler->get_handlers('field');
 
-  /*
-   * Returns first non excluded text field.
-   */
-  function get_first_non_excluded_text_field() {
-    // Set possible text field types.
-    $text_types = $this->get_text_field_types();
-    // Search for each possible type of text field.
-    foreach ($text_types as $text_type) {
-      $field_data = $this->get_first_non_excluded_field($text_type);
-      // Return the fist text field found.
-      if (!empty($field_data)) {
-        return $field_data;
+    $result = array();
+    foreach ($fields as $field_name => $field) {
+      // Ignore excluded fields.
+      if (!empty($field->options['exclude']))
+        continue;
+
+      $field_valid = FALSE;
+      if (isset($field->field_info)) {
+        $type = empty($field->field_info['type']) ? NULL : $field->field_info['type'];
+        // Consider valid if it is of any text type.
+        if (in_array($type, $this->get_text_field_types())) {
+          $field_valid = TRUE;
+        }
+      }
+      // Consider valid if names start with 'title' and 'nothing'.
+      // These correspond to Content:title and Global: Custom text.
+      elseif (substr($field_name, 0, 5) == 'title' || substr($field_name, 0, 7) == 'nothing') {
+        $field_valid = TRUE;
+      }
+
+      if ($field_valid) {
+        //$result[] = array('handler' => $field, 'field_name' => $field_name);
+        $result[$field_name] = $field;
       }
     }
-    return NULL;
+    return count($result) ? $result : NULL;
   }
 
   /**
@@ -328,8 +335,8 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
     // Check if there is a text field in the fields list in case text field is set as caption source.
     $caption_source = $this->options['caption']['source'];
     if (!empty($caption_source) && $caption_source != 'alt' && $caption_source != 'title') {
-      $text_field = $this->get_first_non_excluded_text_field()['handler'];
-      if (empty($text_field)) {
+      $text_fields = $this->get_non_excluded_text_fields();
+      if (empty($text_fields)) {
         $errors[] = t('A text field is set as caption source in @title format settings but is either not present or hidden in the fields list.', array('@title' => $this->plugin_title()));
       }
     }
