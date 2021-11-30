@@ -81,9 +81,9 @@ function masonry_gallery_config_info() {
  * Displays warning about styles in preview mode.
 }*/
 function masonry_gallery_views_pre_render(&$view) {
-  if (isset($view->preview)) {
+  if (isset($view->live_preview)) {
     $options = $view->style_plugin->options;
-    if (!empty($options['captions']['source'])) {
+    if (!empty($options['caption']['source'])) {
       // Get deafault and views theme names.
       $default_theme_name = config_get('system.core', 'theme_default');
       $views_theme_name = config_get('views_ui.settings', 'custom_theme');
@@ -127,7 +127,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
     $images_rendered = array();
     $images_ratio    = array();
     $captions = empty($options['caption']['source']) ? NULL : array();
-    
+
     // Set caption class depending on caption display option.
     switch ($options['caption']['display']) {
       case 'static':
@@ -154,14 +154,14 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
       // image field has a single value.
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
-      
+
       // Check that image width and height are not zero.
       // Zero height/width may indicate that image file is missing.
       if ($width > 0 && $height > 0) {
         // Calculate image width and height ratio. It will be used
         // for gallery arrangement via javascript.
         $images_ratio[$i] = $width/$height;
-        
+
         // Store rendered image field.
         $images_rendered[$i] = $style_plugin->get_field($i, $image_field_name);
 
@@ -209,7 +209,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
 
   // Create unique id for the masonry gallery.
   $masonry_id = 'masonry-gallery-' . $view->name . '-' . $view->current_display;
-  
+
   $vars['masonry_id']      = $masonry_id;
   $vars['images_rendered'] = $images_rendered;
   $vars['captions']        = $captions;
@@ -265,7 +265,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
   // The rest of the function code below generates customized CSS, based on
   // configuration, and module options.
   $custom_css = '';
-  
+
   // If columns number is set to auto, then extrapolate columns number
   // for each screen(breakpoint) between desktop value and 1(phone).
   if ($options['columns']['auto']) {
@@ -296,7 +296,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
         $options['columns']['smartphone'] = intval(ceil($options['columns']['desktop'] * 0.25));
     }
   }
-  
+
   // Create gallery style based on columns settings.
   $custom_css .= "
     #{$masonry_id}.masonry-gallery {
@@ -348,8 +348,8 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
 
   // Check loader style setting.
   $loader_style = $config->get('loader_style');
+
   // If one of the loader styles selected then add it's CSS file.
-  
   if (!empty($loader_style)) {
     backdrop_add_css($module_dir . '/css/masonry_gallery_loader_' . $loader_style . '.css');
 

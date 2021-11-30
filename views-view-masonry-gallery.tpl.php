@@ -13,7 +13,7 @@
  */
 ?>
 
-<?php if(isset($view->preview)): ?>
+<?php if(isset($view->live_preview)): ?>
 <style>
 <?php print $custom_css;?>
 </style>

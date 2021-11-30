@@ -9,7 +9,7 @@
  */
 function masonry_gallery_views_plugins() {
   $module_path = backdrop_get_path('module', 'masonry_gallery');
-  
+
   return array(
     'style' => array(
       'masonry_gallery' => array(

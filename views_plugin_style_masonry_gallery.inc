@@ -307,8 +307,8 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
 
   /**
    * Validates the view configuration.
-   * Fails if there is a non-image or non-text field, or there are more
-   * than one image and text fields that are not excluded from display.
+   * Fails if there is no image field, or there is no text field in
+   * case it is set as caption source in the plugin settings.
    */
   function validate() {
     $errors = parent::validate();
@@ -319,57 +319,19 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
       return $errors;
     }
 
-    // Get a list of fields that have been added to the display.
-    $fields = $this->display->handler->get_handlers('field');
-
-    $image_field_count = 0;
-    $text_field_count  = 0;
-
-    foreach ($fields as $field_name => $field) {
-      // Ignore fields excluded from display.
-      if (!empty($field->options['exclude'])) {
-        continue;
-      }
-
-      // Check field type.
-      if (isset($field->field_info['type'])) {
-        $field_type = $field->field_info['type'];
-      }
-      elseif ($field->field == 'title') {
-        $field_type = 'title';
-      }
-      $is_image = $field_type == 'image';
-      $is_text = in_array($field_type, $this->get_text_field_types());
-      $is_title = $field_name == 'title';
-
-      // If invalid field type found then validation failed.
-      if (!$is_image && !$is_text && !$is_title) {
-        $errors[] = t('Invalid field types found. This format requires one image field, and may optionally have one text or title field.');
-        return $errors;
-      }
-
-      // Count valid fields.
-      if ($is_image) {
-        $image_field_count ++;
-      }
-      if ($is_text || $is_title) {
-        $text_field_count++;
-      }
-
-      // Check if there is no more than one of each valid field types.
-      if ($image_field_count > 1) {
-        $errors[] = t('There is more than one image field. This format can display only one image field.');
-        break;
-      }
-      if ($text_field_count > 1) {
-        $errors[] = t('There is more than one text field. This format can display only one text or title field.');
-        break;
-      }
+    // Check if there is an image field in the fields list.
+    $image_field = $this->get_first_non_excluded_image_field();
+    if (empty($image_field)) {
+      $errors[] = t('Image field is not found or excluded from display. @title format requires one image field.', array('@title' => $this->plugin_title()));
     }
 
-    // Check if there is at least one image field.
-    if ($image_field_count < 1) {
-      $errors[] = t('There are no image fields. This format requires at least one image field.');
+    // Check if there is a text field in the fields list in case text field is set as caption source.
+    $caption_source = $this->options['caption']['source'];
+    if (!empty($caption_source) && $caption_source != 'alt' && $caption_source != 'title') {
+      $text_field = $this->get_first_non_excluded_text_field()['handler'];
+      if (empty($text_field)) {
+        $errors[] = t('A text field is set as caption source in @title format settings but is either not present or hidden in the fields list.', array('@title' => $this->plugin_title()));
+      }
     }
 
     return $errors;
