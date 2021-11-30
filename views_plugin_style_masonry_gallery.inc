@@ -298,7 +298,6 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
       }
 
       if ($field_valid) {
-        //$result[] = array('handler' => $field, 'field_name' => $field_name);
         $result[$field_name] = $field;
       }
     }
