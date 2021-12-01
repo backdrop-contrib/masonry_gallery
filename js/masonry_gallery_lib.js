@@ -87,6 +87,7 @@ function MasonryGallery(newSettings) {
           minColumn = c;
         }
       });
+
       // Add item height to the column with minimal height.
       let itemHeight = columnWidth/ratio[i] + settings.captionHeight + settings.gap;
       columnHeight[minColumn] += itemHeight;

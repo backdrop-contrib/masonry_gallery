@@ -81,9 +81,9 @@ function masonry_gallery_config_info() {
  * Displays warning about styles in preview mode.
 }*/
 function masonry_gallery_views_pre_render(&$view) {
-  if (isset($view->preview)) {
+  if (isset($view->live_preview)) {
     $options = $view->style_plugin->options;
-    if (!empty($options['captions']['source'])) {
+    if (!empty($options['caption']['source'])) {
       // Get deafault and views theme names.
       $default_theme_name = config_get('system.core', 'theme_default');
       $views_theme_name = config_get('views_ui.settings', 'custom_theme');
@@ -116,10 +116,11 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
   $config  = config('masonry_gallery.settings');
   $options = $vars['options'];
 
-  // Find names of the image and body fields handlers.
-  // These are needed to retrieve fields raw and rendered data.
+  // Find name of the image field handler.
+  // It is needed to retrieve fields raw and rendered data.
   $image_field_name = $style_plugin->get_first_non_excluded_image_field()['field_name'];
-  $text_field_name  = $style_plugin->get_first_non_excluded_text_field()['field_name'];
+  // Get list of valid text fields.
+  $text_fields = $style_plugin->get_non_excluded_text_fields();
 
   // Get and process all the required data for image display.
   if (isset($image_field_name)) {
@@ -127,7 +128,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
     $images_rendered = array();
     $images_ratio    = array();
     $captions = empty($options['caption']['source']) ? NULL : array();
-    
+
     // Set caption class depending on caption display option.
     switch ($options['caption']['display']) {
       case 'static':
@@ -154,42 +155,42 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
       // image field has a single value.
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
-      
+
       // Check that image width and height are not zero.
       // Zero height/width may indicate that image file is missing.
       if ($width > 0 && $height > 0) {
         // Calculate image width and height ratio. It will be used
         // for gallery arrangement via javascript.
         $images_ratio[$i] = $width/$height;
-        
+
         // Store rendered image field.
         $images_rendered[$i] = $style_plugin->get_field($i, $image_field_name);
 
         // If caption source is set then store captions.
         switch ($options['caption']['source']) {
-          case 'alt':
+          case 'alt_tag':
             $alt_value = $image_field_value[0]['alt'];
             if (isset($alt_value) && $alt_value != '') {
               $captions[$i] = '<p>' . $alt_value . '</p>';
             }
             break;
-          case 'title':
+          case 'title_tag':
             $title_value = $image_field_value[0]['title'];
             if (!empty($title_value)) {
               $captions[$i] = '<p>' . $title_value . '</p>';
             }
             break;
-          case 'text':
-            if (isset($text_field_name)) {
+          default:
+            if (!empty($text_fields)) {
               // Get text field as caption.
+              $text_field_name = $options['caption']['source'];
               $text = $style_plugin->get_field($i, $text_field_name);
               // If text is not html then wrap it in <p> tags. This is required for proper styling.
-              if ($text == strip_tags($text)) {
+              if ($text == strip_tags($text) && !empty($text)) {
                 $text = '<p>' . $text . '</p>';
               }
               $captions[$i] = $text;
             }
-            break;
         }
       }
       elseif (empty($options['hide_empty'])) {
@@ -209,7 +210,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
 
   // Create unique id for the masonry gallery.
   $masonry_id = 'masonry-gallery-' . $view->name . '-' . $view->current_display;
-  
+
   $vars['masonry_id']      = $masonry_id;
   $vars['images_rendered'] = $images_rendered;
   $vars['captions']        = $captions;
@@ -265,7 +266,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
   // The rest of the function code below generates customized CSS, based on
   // configuration, and module options.
   $custom_css = '';
-  
+
   // If columns number is set to auto, then extrapolate columns number
   // for each screen(breakpoint) between desktop value and 1(phone).
   if ($options['columns']['auto']) {
@@ -296,7 +297,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
         $options['columns']['smartphone'] = intval(ceil($options['columns']['desktop'] * 0.25));
     }
   }
-  
+
   // Create gallery style based on columns settings.
   $custom_css .= "
     #{$masonry_id}.masonry-gallery {
@@ -348,8 +349,8 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
 
   // Check loader style setting.
   $loader_style = $config->get('loader_style');
+
   // If one of the loader styles selected then add it's CSS file.
-  
   if (!empty($loader_style)) {
     backdrop_add_css($module_dir . '/css/masonry_gallery_loader_' . $loader_style . '.css');
 
