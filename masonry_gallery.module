@@ -186,7 +186,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
               $text_field_name = $options['caption']['source'];
               $text = $style_plugin->get_field($i, $text_field_name);
               // If text is not html then wrap it in <p> tags. This is required for proper styling.
-              if ($text == strip_tags($text)) {
+              if ($text == strip_tags($text) && !empty($text)) {
                 $text = '<p>' . $text . '</p>';
               }
               $captions[$i] = $text;

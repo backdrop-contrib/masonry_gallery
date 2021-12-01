@@ -31,10 +31,8 @@
         <?php if(!empty($loader)):?>
           <div class="masonry-gallery-loader"></div>
         <?php endif ?>
-        <?php if(!empty($captions[$i])): ?>
-          <div<?php if(!empty($caption_class)): print(' class="' . $caption_class . '"'); endif;?>>
-            <?php print $captions[$i] ?>
-          </div>
+        <?php if(isset($captions[$i])): ?>
+          <div<?php if(!empty($caption_class)): print(' class="' . $caption_class . '"'); endif; print('>' . $captions[$i]); ?></div>
         <?php endif ?>
       <?php endif ?>
     </div>

@@ -39,6 +39,17 @@
   opacity: 1;
 }
 
+/* hide hovering captions on small and touch screens */
+@media only screen and (max-width: 62em), (any-hover: none) {
+  .masonry-gallery-caption.hover {
+    display: none;
+  }
+}
+
+.masonry-gallery-caption:empty{
+  visibility: hidden;
+}
+
 .masonry-gallery-caption > *{
   display: block;
   margin: auto 0;
