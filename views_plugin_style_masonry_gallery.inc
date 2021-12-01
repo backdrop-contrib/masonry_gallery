@@ -149,8 +149,8 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
 
     // Set options list for caption selector.
     $caption_options = array(
-      'alt'        => t('Image alt tag'),
-      'title'      => t('Image title tag'),
+      'alt_tag'        => t('Image alt tag'),
+      'title_tag'      => t('Image title tag'),
     );
     // Detect if valid text fields are present, and add them to the options list.
     $text_fields = $this->get_non_excluded_text_fields();
