@@ -168,13 +168,13 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
 
         // If caption source is set then store captions.
         switch ($options['caption']['source']) {
-          case 'alt':
+          case 'alt_tag':
             $alt_value = $image_field_value[0]['alt'];
             if (isset($alt_value) && $alt_value != '') {
               $captions[$i] = '<p>' . $alt_value . '</p>';
             }
             break;
-          case 'title':
+          case 'title_tag':
             $title_value = $image_field_value[0]['title'];
             if (!empty($title_value)) {
               $captions[$i] = '<p>' . $title_value . '</p>';
