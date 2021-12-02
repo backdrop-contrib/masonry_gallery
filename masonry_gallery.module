@@ -189,7 +189,7 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
               if ($text == strip_tags($text) && !empty($text)) {
                 $text = '<p>' . $text . '</p>';
               }
-              $captions[$i] = $text;
+              $captions[$i] = $text ? $text : ''; // Ensure that caption is at least an empty string.
             }
         }
       }
