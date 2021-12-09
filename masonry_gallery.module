@@ -299,8 +299,12 @@ function template_preprocess_views_view_masonry_gallery(&$vars) {
   }
 
   // Truncate number of columns if it is less than number of items.
-  foreach ($options['columns'] as &$screen_size) {
-    $screen_size = $rows < $screen_size ? $rows : $screen_size;
+  if ($options['columns']['truncate']) {
+    foreach ($options['columns'] as &$screen_size) {
+      if (is_numeric($screen_size)) { // (!)Potential bug if other numeric setting(s) for columns added.
+        $screen_size = $rows < $screen_size ? $rows : $screen_size;
+      }
+    }
   }
 
   // Create gallery style based on columns settings.
