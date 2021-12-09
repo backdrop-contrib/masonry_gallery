@@ -20,6 +20,7 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
         'tablet'      => 3,
         'smartphone'  => 2,
         'phone'       => 1,
+        'truncate'    => TRUE,
       ),
     );
     $options['caption'] = array(
@@ -137,6 +138,13 @@ class views_plugin_style_masonry_gallery extends views_plugin_style {
           ':input[name="style_options[columns][auto]"]' => array('checked' => TRUE),
         ),
       ),
+    );
+
+    $form['columns']['truncate'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Truncate'),
+      '#description' => t("Adjust number of columns so that it does not exceed number of images."),
+      '#default_value' => $this->options['columns']['truncate'],
     );
 
     // Caption options fieldset.
